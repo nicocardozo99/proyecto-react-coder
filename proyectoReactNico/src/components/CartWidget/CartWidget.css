@@ -1,0 +1,19 @@
+.cart-widget {
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    font-size: 30px;
+    color: wheat;
+}
+
+.qty-display {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        background-color: rgb(21, 73, 100);
+        border-radius: 50%;
+        font-size: 12px;
+        position: absolute;
+        text-align: center;
+        line-height: 17px;
+}
