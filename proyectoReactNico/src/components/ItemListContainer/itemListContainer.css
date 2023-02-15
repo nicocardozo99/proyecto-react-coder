@@ -1,0 +1,10 @@
+.productos {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+.card-body img {
+    width: 250px;
+}
