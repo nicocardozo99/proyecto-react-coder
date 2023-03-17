@@ -1,55 +1,49 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { gFetch } from "../../utils/gFetch";
+import { useParams } from "react-router-dom";
+import ItemList from "../ItemList/ItemList";
 import "./itemListContainer.css";
+import BorderExample from "../BorderExample/BorderExample";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+} from "firebase/firestore";
 
 export const ItemListContainer = ({ saludo }) => {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { idCategoria } = useParams()
+  const { idCategoria } = useParams();
 
   useEffect(() => {
-    if (idCategoria) {
-      gFetch()
-      .then(resp => setProductos(resp.filter(producto=> producto.categoria === idCategoria)))
-      .catch((err) => console.log(err))
-      .finally(() => setLoading(false));
+    const db = getFirestore();
+    const queryCollection = collection(db, "Productos");
 
-    } else {
-      gFetch()
-        .then((resp) => setProductos(resp))
-        .catch((err) => console.log(err))
-        .finally(() => setLoading(false));
-    }
+    // filtro
+    const queryFilter = idCategoria
+      ? query(queryCollection, where("categoria", "==", idCategoria))
+      : queryCollection;
+
+    getDocs(queryFilter)
+      .then((respCollection) =>
+        setProductos(
+          respCollection.docs.map((prod) => ({ id: prod.id, ...prod.data() }))
+        )
+      )
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
   }, [idCategoria]);
 
   return (
     <>
-      <p>{saludo}</p>
       {loading ? (
-        <p>Cargando...</p>
+        <BorderExample />
       ) : (
-        <div className="productos">
-          {productos.map((producto) => (
-            <div key={producto.id} className="card m-5 mt-2">
-              <div className="card-header">Nombre: {producto.name}</div>
-              <div className="card-body">
-                <img src={producto.foto} alt="" />
-                <br />
-                <label>Categoria: {producto.categoria} </label>
-                <br />
-                <label> Precio: {producto.price} </label>
-                <br />
-                <label> Stock: {producto.stock} </label>
-              </div>
-              <div className="card-footer">
-                <Link to={`/detalle/${producto.id}`}>
-                <button className="btn btn-outline-dark w-100">Detalle</button>
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
+        <>
+          <p>{saludo}</p>
+          <ItemList productos={productos} />
+        </>
       )}
     </>
   );
